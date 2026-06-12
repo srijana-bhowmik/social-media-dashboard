@@ -5,13 +5,16 @@ const db=require('./config/db');
 const authRoutes=require('./routes/authRoutes');
 const verifyToken = require("./middleware/authMiddleware");
 const authorizeRoles = require("./middleware/roleMiddleware");
+const socialAccountRoutes = require("./routes/socialAccountRoutes");
+
 
 const app=express();
 const PORT=process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use('/api/auth',authRoutes);
+app.use('/api/auth',authRoutes);    //authRoutes.js, this route is used for authentication, it contains the register and login routes
+app.use('/api/social-account', socialAccountRoutes);    //socialAccountController.js, this route is used for adding social accounts, it is protected by the verifyToken middleware, only authenticated users can access this route
 
 app.get('/',(req,res)=>{ 
     res.send("hello world");
