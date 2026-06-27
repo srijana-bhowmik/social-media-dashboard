@@ -5,8 +5,7 @@ import Navbar from "../components/Navbar";
 import FollowersChart from "../components/FollowersChart";
 import MetricsTable from "../components/MetricsTable";
 import PlatformComparisonChart from "../components/PlatformComparisonChart";
-import LikesPieChart from "../components/LikesPieChart";
-// import AddAccountForm from "../components/AddAccountForm";
+import LikesPieChart from "../components/LikesPieChart"; 
 
 const Dashboard=()=>{ 
     const [summary, setSummary] = useState({
@@ -88,10 +87,8 @@ const Dashboard=()=>{
                         ))
                     }
                 </div>   
-            </div> 
-            {/* <div>
-                <AddAccountForm/>
-            </div> */}
+            </div>  
+            
             <div className=" flex justify-center">  
                 <FollowersChart accounts={accounts} accountId={selectedAccount} setSelectedAccount={setSelectedAccount}/>
             </div>

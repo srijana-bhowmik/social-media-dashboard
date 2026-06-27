@@ -62,8 +62,48 @@ const getSocialAccounts = (req, res) => {
     );
 };
 
+const deleteSocialAccount = (req, res) => {
+
+    const { id } = req.params;
+
+    db.query(
+        "DELETE FROM social_metrics WHERE account_id = ?",
+        [id],
+        (err) => {
+
+            if (err) {
+                console.error(err);
+
+                return res.status(500).json({
+                    message: "Database error"
+                });
+            }
+
+            db.query(
+                "DELETE FROM social_accounts WHERE id = ?",
+                [id],
+                (err) => {
+
+                    if (err) {
+                        console.error(err);
+
+                        return res.status(500).json({
+                            message: "Database error"
+                        });
+                    }
+
+                    res.status(200).json({
+                        message: "Account deleted successfully"
+                    });
+                }
+            );
+        }
+    );
+};
+
 
 module.exports = {
     addSocialAccount,
-    getSocialAccounts
+    getSocialAccounts,
+    deleteSocialAccount
 };
