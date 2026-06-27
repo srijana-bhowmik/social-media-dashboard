@@ -40,7 +40,7 @@ const getMetricsByAccount = (req, res) => {
     const { accountId } = req.params;
 
     db.query(
-        `SELECT * FROM social_metrics WHERE account_id = ? ORDER BY recorded_at DESC`,
+        `SELECT * FROM social_metrics WHERE account_id = ? ORDER BY recorded_at ASC`,
         [accountId],
         (err, result) => {
 

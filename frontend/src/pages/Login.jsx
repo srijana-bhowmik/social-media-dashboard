@@ -2,68 +2,66 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 
-function Login() {
-
+const Login=()=>{
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const navigate = useNavigate();
-
     const handleLogin = async (e) => {
         e.preventDefault();
-
         try {
-
-            const res = await API.post("/auth/login", {
-                email,
-                password
-            });
-
-            localStorage.setItem(
-                "token",
-                res.data.token
-            );
-
+            const res = await API.post("/auth/login", { email, password });
+            localStorage.setItem("token", res.data.token);
             navigate("/dashboard");
-
         } catch (error) {
             alert("Login failed");
         }
     };
 
-    return (
-        <div>
-            <h2>Login</h2>
 
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) =>
-                        setEmail(e.target.value)
-                    }
-                />
+return (
+  <div className="min-h-screen bg-black flex items-center justify-center">
 
-                <br /><br />
+    <div className="bg-slate-800 p-8 rounded-2xl shadow-xl w-96">
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
-                />
+      <h1 className="text-3xl font-bold text-white mb-2">
+        Social Dashboard
+      </h1>
 
-                <br /><br />
+      <p className="text-slate-400 mb-6">
+        Sign in to continue
+      </p>
 
-                <button type="submit">
-                    Login
-                </button>
-            </form>
-        </div>
-    );
+      <form onSubmit={handleLogin}>
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-3 mb-4 rounded-lg bg-slate-700 text-white outline-none"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-3 mb-4 rounded-lg bg-slate-700 text-white outline-none"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition"
+        >
+          Login
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+)
 }
 
-export default Login;
+export default Login

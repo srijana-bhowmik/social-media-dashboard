@@ -1,32 +1,15 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route
-} from "react-router-dom";
+import React from 'react'
+import {Routes,Route} from 'react-router-dom'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-
-function App() {
-  return (
-    <BrowserRouter>
-
-      <Routes>
-
-        <Route
-          path="/"
-          element={<Login />}
-        />
-
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-      </Routes>
-
-    </BrowserRouter>
+const App = () => {
+   return (
+    <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
   );
 }
 
-export default App;
+export default App
