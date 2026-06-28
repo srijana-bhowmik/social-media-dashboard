@@ -55,6 +55,16 @@ return (
         >
           Login
         </button>
+        <p className="text-slate-400 text-center mt-4">
+          Don't have an account?
+
+          <span
+              onClick={() => navigate("/register")}
+              className="text-blue-500 cursor-pointer ml-2"
+          >
+              Register
+          </span>
+      </p>
 
       </form>
 

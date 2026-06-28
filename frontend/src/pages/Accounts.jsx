@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import API from "../services/api";
+import { jwtDecode } from "jwt-decode";
 
 const Accounts = () => {
+    const token = localStorage.getItem("token");    //delete button is available to only admin(RBAC)
+    const user=token?jwtDecode(token):null;
 
     const [accounts, setAccounts] = useState([]);
     useEffect(() => {
@@ -86,12 +89,14 @@ const Accounts = () => {
                                 <p className="text-slate-300">
                                     {account.account_name}
                                 </p>
-                                <button
-                                    onClick={() => handleDelete(account.id)}
-                                    className="mt-4 bg-red-900 hover:bg-red-700 px-2 py-1 rounded-lg text-white"
-                                >
-                                    Delete
-                                </button>
+                                {user?.role=="admin" && (
+                                    <button
+                                        onClick={() => handleDelete(account.id)}
+                                        className="mt-4 bg-red-900 hover:bg-red-700 px-2 py-1 rounded-lg text-white"
+                                    >
+                                        Delete
+                                    </button>
+                                )} 
 
                             </div>
 

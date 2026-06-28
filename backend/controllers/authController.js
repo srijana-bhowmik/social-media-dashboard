@@ -5,9 +5,9 @@ const db = require("../config/db");
 
 // Register a new user-- post in postman
 //  created API in postman: http://localhost:3000/api/auth/register
-const register = async (req, res) => {
+const register = async (req, res) => {      //every new user who registers is a viewer automatically
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -19,6 +19,7 @@ const register = async (req, res) => {
             "SELECT * FROM users WHERE email = ?",
             [email],
             async (err, result) => {
+
                 if (err) {
                     return res.status(500).json(err);
                 }
@@ -29,7 +30,8 @@ const register = async (req, res) => {
                     });
                 }
 
-                const hashedPassword = await bcrypt.hash(password, 10);
+                const hashedPassword =
+                    await bcrypt.hash(password, 10);
 
                 db.query(
                     "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
@@ -37,9 +39,10 @@ const register = async (req, res) => {
                         name,
                         email,
                         hashedPassword,
-                        role || "viewer"
+                        "viewer"
                     ],
                     (err, result) => {
+
                         if (err) {
                             return res.status(500).json(err);
                         }
@@ -51,6 +54,7 @@ const register = async (req, res) => {
                 );
             }
         );
+
     } catch (error) {
         res.status(500).json(error);
     }
