@@ -57,6 +57,33 @@ const Accounts = () => {
                 console.log(error);
             }
         };
+        const handleSync = async (id) => {
+            try {
+
+                const token = localStorage.getItem("token");
+
+                const res = await API.post(
+                    `/social-account/sync/${id}`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                alert(res.data.message);
+
+            } catch (error) {
+
+                console.log(error);
+
+                alert(
+                    error.response?.data?.message ||
+                    "Sync failed"
+                );
+            }
+        };
 
     return (
         <div className="flex">
@@ -90,12 +117,20 @@ const Accounts = () => {
                                     {account.account_name}
                                 </p>
                                 {user?.role=="admin" && (
+                                    <>
+                                    <button
+                                        onClick={() => handleSync(account.id)}
+                                        className="mt-4 mr-2 bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-lg text-white"
+                                    >
+                                        Sync
+                                    </button> 
                                     <button
                                         onClick={() => handleDelete(account.id)}
                                         className="mt-4 bg-red-900 hover:bg-red-700 px-2 py-1 rounded-lg text-white"
                                     >
                                         Delete
                                     </button>
+                                    </>
                                 )} 
 
                             </div>

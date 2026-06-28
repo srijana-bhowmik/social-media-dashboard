@@ -101,9 +101,55 @@ const deleteSocialAccount = (req, res) => {
     );
 };
 
+const syncAccount = (req, res) => {
+
+    const { id } = req.params;
+
+    const followers =
+        Math.floor(Math.random() * 5000) + 500;
+
+    const likes =
+        Math.floor(Math.random() * 1000) + 100;
+
+    const comments =
+        Math.floor(Math.random() * 200) + 20;
+
+    const shares =
+        Math.floor(Math.random() * 100) + 10;
+
+    db.query(
+        `INSERT INTO social_metrics
+        (account_id, followers, likes_count,
+         comments_count, shares_count)
+        VALUES (?, ?, ?, ?, ?)`,
+        [
+            id,
+            followers,
+            likes,
+            comments,
+            shares
+        ],
+        (err, result) => {
+
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                    message: "Database error"
+                });
+            }
+
+            res.status(200).json({
+                message: "Account synced successfully"
+            });
+        }
+    );
+};
+
 
 module.exports = {
     addSocialAccount,
     getSocialAccounts,
-    deleteSocialAccount
+    deleteSocialAccount,
+    syncAccount
 };
