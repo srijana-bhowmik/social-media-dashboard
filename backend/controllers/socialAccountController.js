@@ -105,43 +105,71 @@ const syncAccount = (req, res) => {
 
     const { id } = req.params;
 
-    const followers =
-        Math.floor(Math.random() * 5000) + 500;
-
-    const likes =
-        Math.floor(Math.random() * 1000) + 100;
-
-    const comments =
-        Math.floor(Math.random() * 200) + 20;
-
-    const shares =
-        Math.floor(Math.random() * 100) + 10;
-
     db.query(
-        `INSERT INTO social_metrics
-        (account_id, followers, likes_count,
-         comments_count, shares_count)
-        VALUES (?, ?, ?, ?, ?)`,
-        [
-            id,
-            followers,
-            likes,
-            comments,
-            shares
-        ],
+        `SELECT *
+         FROM social_metrics
+         WHERE account_id = ?
+         ORDER BY recorded_at DESC
+         LIMIT 1`,
+        [id],
         (err, result) => {
 
             if (err) {
-                console.log(err);
-
                 return res.status(500).json({
                     message: "Database error"
                 });
             }
 
-            res.status(200).json({
-                message: "Account synced successfully"
-            });
+            let followers = 500;
+            let likes = 100;
+            let comments = 20;
+            let shares = 5;
+
+            if (result.length > 0) {
+
+                followers =
+                    result[0].followers +
+                    Math.floor(Math.random() * 50) + 10;
+
+                likes =
+                    result[0].likes_count +
+                    Math.floor(Math.random() * 30) + 5;
+
+                comments =
+                    result[0].comments_count +
+                    Math.floor(Math.random() * 10) + 1;
+
+                shares =
+                    result[0].shares_count +
+                    Math.floor(Math.random() * 5) + 1;
+            }
+
+            db.query(
+                `INSERT INTO social_metrics
+                (account_id, followers,
+                 likes_count, comments_count,
+                 shares_count)
+                VALUES (?, ?, ?, ?, ?)`,
+                [
+                    id,
+                    followers,
+                    likes,
+                    comments,
+                    shares
+                ],
+                (err2, result2) => {
+
+                    if (err2) {
+                        return res.status(500).json({
+                            message: "Database error"
+                        });
+                    }
+
+                    res.status(200).json({
+                        message: "Account synced successfully"
+                    });
+                }
+            );
         }
     );
 };
