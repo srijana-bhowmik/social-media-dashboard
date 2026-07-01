@@ -39,6 +39,28 @@ const syncFacebookMetrics = () => {
 
                         const likes =
                             pageRes.data.fan_count || 0;
+                        const postsRes = await axios.get(
+                            `${FB_API_BASE}/${page_id}/posts`,
+                            {
+                                params: {
+                                    fields: "shares,comments.summary(true)",
+                                    limit: 10,
+                                    access_token
+                                }
+                            }
+                        );
+
+                        let totalComments = 0;
+                        let totalShares = 0;
+
+                        for (const post of postsRes.data.data) {
+
+                            totalComments +=
+                                post.comments?.summary?.total_count || 0;
+
+                            totalShares +=
+                                post.shares?.count || 0;
+                        }
 
                         db.query(
                             `INSERT INTO social_metrics
@@ -48,16 +70,18 @@ const syncFacebookMetrics = () => {
                                 account_id,
                                 followers,
                                 likes,
-                                0,
-                                0
+                                totalComments,
+                                totalShares
                             ]
                         );
 
-                        console.log("Facebook synced:", {
-                            account_id,
-                            followers,
-                            likes
-                        });
+                    console.log("Facebook synced:", {
+                        account_id,
+                        followers,
+                        likes,
+                        comments: totalComments,
+                        shares: totalShares
+                    });
 
                     } catch (apiErr) {
                         console.error(

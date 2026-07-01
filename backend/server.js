@@ -12,7 +12,7 @@ const syncInstagramMetrics = require("./jobs/metricsSyncJob");
 const syncFacebookMetrics = require("./jobs/facebookSyncJob");
 
 const app=express();
-const PORT=process.env.PORT || 3000;
+const PORT=process.env.PORT || 3000; 
 
 app.use(cors());
 app.use(express.json());

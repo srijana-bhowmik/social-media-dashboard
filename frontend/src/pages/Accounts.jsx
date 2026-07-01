@@ -124,12 +124,14 @@ const Accounts = () => {
                                     >
                                         Sync
                                     </button>  */}
+                                {account.platform !== "instagram" && (
                                     <button
                                         onClick={() => handleDelete(account.id)}
                                         className="mt-4 bg-red-900 hover:bg-red-700 px-2 py-1 rounded-lg text-white"
                                     >
                                         Delete
                                     </button>
+                                )}
                                     {/* </>
                                 )}  */}
 

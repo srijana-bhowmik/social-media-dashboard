@@ -98,8 +98,7 @@ const login = (req, res) => {
 
             const token = jwt.sign(         //backend gives the user a token that they can use to authenticate future requests, the token contains the user's id and role, and is signed with a secret key
                 {
-                    id: user.id,
-                    role: user.role
+                    id: user.id, 
                 },
                 process.env.JWT_SECRET,
                 {
@@ -121,8 +120,179 @@ const login = (req, res) => {
     );
 };
 
+// const instagramLogin = (req, res) => {
+//   res.send("instagram OAuth coming soon ");
+// }
+
+// const instagramCallback = (req, res) => {
+//   res.send("instagram callback coming soon ");
+// }
+const facebookLogin = (req, res) => {
+
+    const { token } = req.query;
+    //print token in console
+    console.log("token:", token);
+
+    const appId = process.env.META_APP_ID;
+
+    const redirectUri =
+        "http://localhost:3000/api/auth/facebook/callback";
+
+    const scope =
+        "pages_show_list,pages_read_engagement,pages_read_user_content,read_insights,business_management";
+    const authUrl =
+        `https://www.facebook.com/v25.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
+            redirectUri
+        )}&scope=${scope}&state=${token}`;
+
+    res.redirect(authUrl);
+};
+
+const axios = require("axios");
+const facebookCallback = async (req, res) => {
+    try {
+        const { code, state } = req.query;
+        console.log("STATE:", state);
+        const decoded = jwt.verify(
+            state,
+            process.env.JWT_SECRET
+        );
+        const user_id = decoded.id;
+        console.log("USER ID:", user_id);
+
+        const tokenRes = await axios.get(
+            "https://graph.facebook.com/v25.0/oauth/access_token",
+            {
+                params: {
+                    client_id: process.env.META_APP_ID,
+                    client_secret: process.env.META_APP_SECRET,
+                    redirect_uri:
+                        "http://localhost:3000/api/auth/facebook/callback",
+                    code
+                }
+            }
+        );
+
+        console.log("TOKEN RESPONSE:");
+        console.log(tokenRes.data);
+        const accessToken = tokenRes.data.access_token;
+        const pagesRes = await axios.get(
+            "https://graph.facebook.com/v25.0/me/accounts",
+            {
+                params: {
+                    access_token: accessToken
+                }
+            }
+        );
+        console.log("PAGES:");
+        console.log(pagesRes.data);
+        // res.json(pagesRes.data);
+        const page = pagesRes.data.data[0];
+
+        const pageId = page.id;
+        const pageName = page.name;
+        const pageAccessToken = page.access_token;
+        const igRes = await axios.get(
+            `https://graph.facebook.com/v25.0/${pageId}`,
+            {
+                params: {
+                    fields: "instagram_business_account",
+                    access_token: pageAccessToken
+                }
+            }
+        );
+
+        console.log("IG RESPONSE:");
+        console.log(igRes.data); 
+        const igId = igRes.data.instagram_business_account?.id || null;
+        const igProfileRes = await axios.get(
+            `https://graph.facebook.com/v25.0/${igId}`,
+            {
+                params: {
+                    fields:
+                        "username,followers_count,media_count",
+                    access_token: pageAccessToken
+                }
+            }
+        );
+
+        console.log("IG PROFILE:");
+        console.log(igProfileRes.data);
+        const username = igProfileRes.data.username;
+        db.query(
+            `INSERT INTO social_accounts
+            (user_id, platform, account_name, ig_id, access_token, page_id)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                user_id,
+                "facebook",
+                page.name,
+                igId,
+                pageAccessToken,
+                pageId
+            ], 
+            (err, result) => {
+
+                if (err) {
+                    if (err.code === "ER_DUP_ENTRY") {
+                        return res.redirect(
+                            "http://localhost:5173/accounts"
+                        );
+                    }
+
+                    return res.status(500).json({
+                        message: "Database error"
+                    });
+                }
+
+                db.query(
+                    `INSERT INTO social_accounts
+                    (user_id, platform, account_name, ig_id, access_token, page_id)
+                    VALUES (?, ?, ?, ?, ?, ?)`,
+                    [
+                        user_id,
+                        "instagram",
+                        username,
+                        igId,
+                        pageAccessToken,
+                        pageId
+                    ],
+                    (igErr) => {
+
+                        if (
+                            igErr &&
+                            igErr.code !== "ER_DUP_ENTRY"
+                        ) {
+                            console.log(igErr);
+                        }
+
+                        res.redirect(
+                            "http://localhost:5173/accounts"
+                        );
+                    }
+                ); 
+            }
+        );
+
+
+    } catch (error) {
+
+        console.log(
+            error.response?.data || error.message
+        );
+
+        res.status(500).json({
+            error: error.response?.data || error.message
+        });
+    }
+};
+
 
 module.exports = {
     register,
-    login
+    login,
+    // instagramLogin,
+    // instagramCallback,
+    facebookLogin,
+    facebookCallback
 };
