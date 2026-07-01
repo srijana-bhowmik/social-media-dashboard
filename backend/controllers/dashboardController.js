@@ -6,13 +6,19 @@ const getDashboardSummary = (req, res) => {
     const query = `
         SELECT
             COUNT(DISTINCT sa.id) AS totalAccounts,
-            COALESCE(SUM(sm.followers), 0) AS totalFollowers,
-            COALESCE(SUM(sm.likes_count), 0) AS totalLikes,
-            COALESCE(SUM(sm.comments_count), 0) AS totalComments,
-            COALESCE(SUM(sm.shares_count), 0) AS totalShares
+            COALESCE(SUM(sm.followers),0) AS totalFollowers,
+            COALESCE(SUM(sm.likes_count),0) AS totalLikes,
+            COALESCE(SUM(sm.comments_count),0) AS totalComments,
+            COALESCE(SUM(sm.shares_count),0) AS totalShares
         FROM social_accounts sa
         LEFT JOIN social_metrics sm
-        ON sa.id = sm.account_id
+        ON sm.id = (
+            SELECT id
+            FROM social_metrics
+            WHERE account_id = sa.id
+            ORDER BY recorded_at DESC
+            LIMIT 1
+        )
         WHERE sa.user_id = ?
     `;
 
@@ -105,6 +111,8 @@ const getLikesDistribution = (req, res) => {
         res.status(200).json(result);
     });
 };
+
+
 
 module.exports = {
     getDashboardSummary,

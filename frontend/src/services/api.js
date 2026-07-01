@@ -4,4 +4,21 @@ const API = axios.create({      //Creates a customized Axios object, every reque
     baseURL: "http://localhost:3000/api"        // this is API instance
 });
 
+
+// Fetch Instagram metrics (LIVE + DB stored data)
+export const fetchInstagramMetrics = async (data, token) => {
+    const res = await API.post(
+        "/metrics/instagram/fetch",
+        data,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    return res.data;
+};
+
+
 export default API;

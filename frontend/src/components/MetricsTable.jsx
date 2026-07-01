@@ -40,30 +40,20 @@ const MetricsTable = ({accountId}) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {metrics.map((metric) => (
-                            <tr
-                                key={metric.id}
-                                className="border-b border-slate-700 text-white"
-                            >
-                                <td className="p-3">
-                                    {new Date(
-                                        metric.recorded_at
-                                    ).toLocaleDateString()}
-                                </td>
-                                <td className="p-3">
-                                    {metric.followers}
-                                </td>
-                                <td className="p-3">
-                                    {metric.likes_count}
-                                </td>
-                                <td className="p-3">
-                                    {metric.comments_count}
-                                </td>
-                                <td className="p-3">
-                                    {metric.shares_count}
-                                </td>
+                        {[...metrics]
+                        .sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at))
+                        .slice(-8)  //display only the last 8 metrics
+                        .map((metric) => (
+                            <tr key={metric.id} className="border-b border-slate-700 text-white">
+                            <td className="p-3">
+                                {new Date(metric.recorded_at).toLocaleDateString()}
+                            </td>
+                            <td className="p-3">{metric.followers}</td>
+                            <td className="p-3">{metric.likes_count}</td>
+                            <td className="p-3">{metric.comments_count}</td>
+                            <td className="p-3">{metric.shares_count}</td>
                             </tr>
-                        ))}
+                        ))} 
                     </tbody>
                 </table>
             </div>

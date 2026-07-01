@@ -8,6 +8,8 @@ const authorizeRoles = require("./middleware/roleMiddleware");
 const socialAccountRoutes = require("./routes/socialAccountRoutes");
 const metricsRoutes = require("./routes/metricsRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const syncInstagramMetrics = require("./jobs/metricsSyncJob");
+const syncFacebookMetrics = require("./jobs/facebookSyncJob");
 
 const app=express();
 const PORT=process.env.PORT || 3000;
@@ -19,7 +21,8 @@ app.use('/api/social-account', socialAccountRoutes);    //socialAccountControlle
 app.use('/api/metrics', metricsRoutes);    //metricsRoutes.js, this route is used for adding metrics, it is protected by the verifyToken middleware, only authenticated users can access this route
 app.use("/api/dashboard", dashboardRoutes);   //dashboardRoutes.js, this route is used for getting dashboard summary, it is protected by the verifyToken middleware, only authenticated users can access this route
 
-
+syncInstagramMetrics();
+syncFacebookMetrics();
 
 
 app.get('/',(req,res)=>{ 

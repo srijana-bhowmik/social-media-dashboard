@@ -34,12 +34,11 @@ const register = async (req, res) => {      //every new user who registers is a 
                     await bcrypt.hash(password, 10);
 
                 db.query(
-                    "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO users (name, email, password ) VALUES (?, ?, ?)",
                     [
                         name,
                         email,
-                        hashedPassword,
-                        "viewer"
+                        hashedPassword 
                     ],
                     (err, result) => {
 
