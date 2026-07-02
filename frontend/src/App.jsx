@@ -8,6 +8,7 @@ import AddAccount from './pages/AddAccount'
 import Accounts from './pages/Accounts'
 // import {jwtDecode} from "jwt-decode";
 import NotFound from './pages/NotFound'
+import VerifyOTP from './pages/VerifyOTP'
 
 
 const App = () => {
@@ -17,6 +18,7 @@ const App = () => {
     <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
         <Route path="/dashboard" element={<Dashboard />} /> 
         <Route path="/add-account" element={<AddAccount />} /> 
         <Route path="/accounts" element={<Accounts />} />

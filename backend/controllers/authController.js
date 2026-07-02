@@ -1,7 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
-
+const { sendVerificationEmail } = require("../utils/mailer");
+const generateOTP = require("../utils/generateOTP");
 
 // Register a new user-- post in postman
 //  created API in postman: http://localhost:3000/api/auth/register
@@ -32,22 +33,40 @@ const register = async (req, res) => {      //every new user who registers is a 
 
                 const hashedPassword =
                     await bcrypt.hash(password, 10);
-
+                
+                const otp = generateOTP();
+                const expiry = new Date(
+                    Date.now() + 5 * 60 * 1000
+                );
                 db.query(
-                    "INSERT INTO users (name, email, password ) VALUES (?, ?, ?)",
+                    "INSERT INTO users(name,email,password,is_verified,otp,otp_expires) VALUES (?, ?, ?, false, ?, ?)",
                     [
                         name,
                         email,
-                        hashedPassword 
+                        hashedPassword,
+                        otp,
+                        expiry
                     ],
-                    (err, result) => {
+                    async (err, result) => {
 
                         if (err) {
                             return res.status(500).json(err);
                         }
 
+                        await sendVerificationEmail(
+                            email,
+                            "Verify your account",
+                            `
+                            <h2>Welcome to Social Dashboard</h2>
+                            <p>Your OTP is:</p>
+                            <h1>${otp}</h1>
+                            <p>This OTP expires in 5 minutes.</p>
+                            `
+                        );
+
                         res.status(201).json({
-                            message: "User registered successfully"
+                            message:
+                                "Registration successful. Check your email for OTP."
                         });
                     }
                 );
@@ -58,6 +77,51 @@ const register = async (req, res) => {      //every new user who registers is a 
         res.status(500).json(error);
     }
 };
+//verify the opt after registration 
+const verifyOTP = (req, res) => {
+    const { email, otp } = req.body;
+    db.query(
+        "SELECT * FROM users WHERE email = ?",
+        [email],
+        (err, result) => {
+            if (err) {
+                return res.status(500).json(err);
+            }
+            if (result.length === 0) {
+                return res.status(404).json({
+                    message: "User not found"
+                });
+            }
+            const user = result[0];
+            if (user.otp !== otp) {
+                return res.status(400).json({
+                    message: "Invalid OTP"
+                });
+            }
+            if (new Date() > new Date(user.otp_expires)) {
+                return res.status(400).json({
+                    message: "OTP expired"
+                });
+            }
+            db.query(
+                `UPDATE users SET is_verified = true, otp = NULL, otp_expires = NULL WHERE email = ?`,
+                [email],
+                (err) => {
+
+                    if (err) {
+                        return res.status(500).json(err);
+                    }
+
+                    res.json({
+                        message: "Email verified successfully"
+                    });
+                }
+            );
+        }
+    );
+};
+
+
 
 
 //login
@@ -84,7 +148,11 @@ const login = (req, res) => {
             }
 
             const user = result[0];     // user is the first (and only) user in the result array, which contains the user's data including the hashed password
-
+            if(!user.is_verified) {
+                return res.status(403).json({
+                    message: "Please verify your email first"
+                });
+            }
             const isMatch = await bcrypt.compare(        // compare the provided password with the hashed password in the database
                 password,
                 user.password               //bcrypt hashes the password and compares it to the stored hash, returns true if they match, false otherwise
@@ -291,6 +359,7 @@ const facebookCallback = async (req, res) => {
 module.exports = {
     register,
     login,
+    verifyOTP,
     // instagramLogin,
     // instagramCallback,
     facebookLogin,

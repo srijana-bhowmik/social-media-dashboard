@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.3",
     "mysql2": "^3.22.5",
+    "no": "^0.0.1",
     "node-cron": "^4.5.0"
   },
   "devDependencies": {
