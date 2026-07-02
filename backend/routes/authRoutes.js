@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login , verifyOTP, facebookLogin, facebookCallback } = require("../controllers/authController");
+const { register, login , verifyOTP, resendOTP, facebookLogin, facebookCallback } = require("../controllers/authController");
 
 router.post("/register", register);
 router.post("/login", login);
@@ -10,5 +10,6 @@ router.post("/login", login);
 router.get("/facebook", facebookLogin);
 router.get("/facebook/callback", facebookCallback);
 router.post("/verify-otp", verifyOTP);
+router.post("/resend-otp", resendOTP);
 
 module.exports = router;

@@ -22,7 +22,7 @@ const Register = () => {
                 password
             });
 
-            navigate("/verify-otp");
+            navigate("/verify-otp",{ state: { email } });
 
         } catch (error) {
 

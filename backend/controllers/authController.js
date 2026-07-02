@@ -120,7 +120,54 @@ const verifyOTP = (req, res) => {
         }
     );
 };
+const resendOTP = async (req, res) => {
 
+    try {
+
+        const { email } = req.body;
+
+        const otp = generateOTP();
+
+        const expiry = new Date(
+            Date.now() + 5 * 60 * 1000
+        );
+
+        db.query(
+            `UPDATE users
+             SET otp = ?, otp_expires = ?
+             WHERE email = ?`,
+            [
+                otp,
+                expiry,
+                email
+            ],
+            async (err, result) => {
+
+                if (err) {
+                    return res.status(500).json(err);
+                }
+
+                await sendVerificationEmail(
+                    email,
+                    "Verify your account",
+                    `
+                    <h2>Social Dashboard</h2>
+                    <p>Your new OTP is:</p>
+                    <h1>${otp}</h1>
+                    `
+                );
+
+                res.json({
+                    message: "OTP resent successfully"
+                });
+            }
+        );
+
+    } catch (error) {
+
+        res.status(500).json(error);
+    }
+};
 
 
 
@@ -360,6 +407,7 @@ module.exports = {
     register,
     login,
     verifyOTP,
+    resendOTP,
     // instagramLogin,
     // instagramCallback,
     facebookLogin,
