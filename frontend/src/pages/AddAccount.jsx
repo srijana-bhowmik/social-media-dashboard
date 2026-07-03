@@ -20,6 +20,10 @@ const AddAccount = () => {
 
         window.location.href = url;
     };
+    const connectTwitter=()=>{
+        const token=localStorage.getItem("token");
+        window.location.href=`http://localhost:3000/api/auth/twitter?token=${token}`;
+    }
 
     return (
         <div className="flex">
@@ -32,9 +36,9 @@ const AddAccount = () => {
 
                 <div className="p-8">
 
-                    <div className="bg-slate-800 rounded-xl p-6 max-w-xl">
+                    <div className="bg-gray-300 rounded-xl p-6 max-w-xl">
 
-                        <h2 className="text-white text-2xl font-bold mb-6">
+                        <h2 className="text-slate-950 text-2xl font-bold mb-6">
                             Connect Social Account
                         </h2>
 
@@ -52,6 +56,12 @@ const AddAccount = () => {
                                 className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold"
                             >
                                 Connect Facebook & Instagram
+                            </button>
+                            <button
+                                onClick={connectTwitter}
+                                className="bg-black text-white py-3 rounded-lg font-semibold"
+                            >
+                                Connect X
                             </button>
 
                         </div>

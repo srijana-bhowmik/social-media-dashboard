@@ -84,7 +84,10 @@ const Accounts = () => {
         //         );
         //     }
         // };
-
+console.log("ACCOUNTS:", accounts);
+console.log(
+    accounts.map(account => account.platform)
+);
     return (
         <div className="flex">
 

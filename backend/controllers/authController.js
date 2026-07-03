@@ -1,8 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
+const axios = require("axios");
 const { sendVerificationEmail } = require("../utils/mailer");
 const generateOTP = require("../utils/generateOTP");
+const crypto=require('crypto');
 
 // Register a new user-- post in postman
 //  created API in postman: http://localhost:3000/api/auth/register
@@ -263,7 +265,7 @@ const facebookLogin = (req, res) => {
     res.redirect(authUrl);
 };
 
-const axios = require("axios");
+
 const facebookCallback = async (req, res) => {
     try {
         const { code, state } = req.query;
@@ -402,6 +404,204 @@ const facebookCallback = async (req, res) => {
     }
 };
 
+const twitterLogin = async (req, res) => {
+    const token = req.query.token;
+    const state = jwt.sign(
+        {
+            token
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "10m"
+        }
+    );
+    const codeVerifier =
+        crypto.randomBytes(32).toString("hex");
+    const codeChallenge = crypto
+        .createHash("sha256")
+        .update(codeVerifier)
+        .digest("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+    res.cookie(
+        "twitter_code_verifier",
+        codeVerifier,
+        {
+            httpOnly: true
+        }
+    );
+    const url =
+        `https://twitter.com/i/oauth2/authorize` +
+        `?response_type=code` +
+        `&client_id=${process.env.TWITTER_CLIENT_ID}` +
+        `&redirect_uri=${encodeURIComponent(
+            process.env.TWITTER_CALLBACK_URL
+        )}` +
+        `&scope=tweet.read users.read offline.access` +
+        `&state=${state}` +
+        `&code_challenge=${codeChallenge}` +
+        `&code_challenge_method=S256`;
+    res.redirect(url);
+};
+
+const twitterCallback = async (req, res) => {
+    try {
+
+        const { code, state } = req.query;
+
+        const decoded = jwt.verify(
+            state,
+            process.env.JWT_SECRET
+        );
+
+        const token =
+            decoded.token;
+
+        const decodedToken =
+            jwt.verify(
+                token,
+                process.env.JWT_SECRET
+            );
+
+        const user_id =
+            decodedToken.id;
+
+        const codeVerifier =
+            req.cookies.twitter_code_verifier;
+
+        const tokenRes = await axios.post(
+            "https://api.twitter.com/2/oauth2/token",
+            new URLSearchParams({
+                code,
+                grant_type: "authorization_code",
+                client_id: process.env.TWITTER_CLIENT_ID,
+                redirect_uri: process.env.TWITTER_CALLBACK_URL,
+                code_verifier: codeVerifier
+            }),
+            {
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded",
+                    Authorization:
+                        "Basic " +
+                        Buffer.from(
+                            `${process.env.TWITTER_CLIENT_ID}:${process.env.TWITTER_CLIENT_SECRET}`
+                        ).toString("base64")
+                }
+            }
+        );
+
+        console.log( "TWITTER TOKEN:" );
+        console.log(tokenRes.data );
+        const accessToken = tokenRes.data.access_token;
+        // console.log("ACCESS TOKEN SAVED:");
+        // console.log(accessToken);
+
+        db.query(
+            `UPDATE social_accounts SET access_token = ? WHERE platform = 'twitter' AND user_id = ?`,
+            [accessToken, user_id]
+        );
+        const profileRes =
+            await axios.get(
+                "https://api.twitter.com/2/users/me",
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${accessToken}`
+                    },
+                    params: {
+                        "user.fields":
+                            "profile_image_url,public_metrics"
+                    }
+                }
+            );
+        const twitterId=profileRes.data.data.id;
+        const username=profileRes.data.data.username;
+        db.query(
+            `INSERT INTO social_accounts
+            (user_id, platform, account_name, twitter_id, access_token)
+            VALUES (?, ?, ?, ?, ?)`,
+            [
+                user_id,
+                "twitter",
+                username,
+                twitterId,
+                accessToken
+            ],
+            (err) => { 
+                if (err) {
+                    if (err.code === "ER_DUP_ENTRY") {
+                        return res.redirect(
+                            "http://localhost:5173/accounts"
+                        );
+                    }
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message: "Database error"
+                    });
+                }
+                res.redirect(
+                    "http://localhost:5173/accounts"
+                );
+            }
+        );
+
+        console.log("TWITTER PROFILE:");
+        console.log(profileRes.data); 
+
+    } catch (error) {
+
+        console.log(
+            error.response?.data ||
+            error.message
+        );
+
+        res.status(500).json({
+            error:
+                error.response?.data ||
+                error.message
+        });
+    }
+};
+
+// const twitterTest = async (req, res) => {
+//     try {
+
+//         const token =
+//         "PASTE_THE_ACCESS_TOKEN_FROM_DB_HERE";
+
+//         const profileRes =
+//         await axios.get(
+//             "https://api.twitter.com/2/users/me",
+//             {
+//                 headers: {
+//                     Authorization:
+//                         `Bearer ${token}`
+//                 },
+//                 params: {
+//                     "user.fields":
+//                         "public_metrics"
+//                 }
+//             }
+//         );
+
+//         res.json(profileRes.data);
+
+//     } catch (error) {
+
+//         console.log(
+//             error.response?.data ||
+//             error.message
+//         );
+
+//         res.status(500).json(
+//             error.response?.data ||
+//             error.message
+//         );
+//     }
+// };
 
 module.exports = {
     register,
@@ -411,5 +611,8 @@ module.exports = {
     // instagramLogin,
     // instagramCallback,
     facebookLogin,
-    facebookCallback
+    facebookCallback,
+    twitterLogin,
+    twitterCallback
+    // twitterTest
 };

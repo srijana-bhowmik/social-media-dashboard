@@ -55,8 +55,7 @@ const getSocialAccounts = (req, res) => {
                 return res.status(500).json({
                     message: "Database error"
                 });
-            }
-
+            } 
             res.status(200).json(result);
         }
     );

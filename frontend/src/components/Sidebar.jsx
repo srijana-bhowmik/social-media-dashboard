@@ -11,10 +11,10 @@ const Sidebar = ({ closeSidebar }) => {
             </h1>
 
             <div className="flex flex-col gap-4">
-                <Link to="/dashboard" onClick={closeSidebar}>Dashboard</Link>
-                <Link to="/add-account">Add Account</Link>
+                <Link to="/dashboard" onClick={closeSidebar} className="hover:bg-slate-700 p-1 pl-2 rounded">Dashboard</Link>
+                <Link to="/add-account" onClick={closeSidebar} className="hover:bg-slate-700 p-1 pl-2 rounded">Add Account</Link>
                 {/* <Link to="/add-metrics">Add Metrics</Link>   */}
-                <Link to="/accounts">Accounts</Link>
+                <Link to="/accounts" onClick={closeSidebar} className="hover:bg-slate-700 p-1 pl-2 rounded">Accounts</Link>
             </div>
         </div>
     );
