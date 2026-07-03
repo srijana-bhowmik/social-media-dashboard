@@ -52,7 +52,14 @@ const getMetricsByAccount = (req, res) => {
                 });
             }
 
-            res.status(200).json(result);
+            const formattedResult = result.map(row => ({
+                ...row,
+                likes_count: row.likes_count ?? "N/A",
+                comments_count: row.comments_count ?? "N/A",
+                shares_count: row.shares_count ?? "N/A"
+            }));
+
+            res.status(200).json(formattedResult);
         }
     );
 };
@@ -115,7 +122,7 @@ const fetchAndStoreInstagramMetrics = async (req, res) => {
             `INSERT INTO social_metrics 
             (account_id, followers, likes_count, comments_count, shares_count) 
             VALUES (?, ?, ?, ?, ?)`,
-            [account_id, followers, likes, comments, 0],
+            [account_id, followers, likes, comments, null],
             (err) => {
                 if (err) {
                     return res.status(500).json({ message: "DB error" });

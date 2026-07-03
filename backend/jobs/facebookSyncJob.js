@@ -9,7 +9,7 @@ const syncFacebookMetrics = () => {
         console.log("Running Facebook sync job...");
 
         db.query(
-            "SELECT * FROM social_accounts WHERE platform = 'facebook'",
+            "SELECT * FROM social_accounts WHERE platform = 'facebook' and status = 'active'",
             async (err, accounts) => {
 
                 if (err) {
@@ -71,7 +71,7 @@ const syncFacebookMetrics = () => {
                                 followers,
                                 likes,
                                 totalComments,
-                                totalShares
+                                null
                             ]
                         );
 
@@ -84,6 +84,19 @@ const syncFacebookMetrics = () => {
                     });
 
                     } catch (apiErr) {
+                        if (
+                            apiErr.response?.status === 400 ||
+                            apiErr.response?.status === 401
+                        ) {
+                            db.query(
+                                `UPDATE social_accounts
+                                SET status = 'expired'
+                                WHERE user_id = ?
+                                AND (platform = 'facebook' OR platform = 'instagram')`,
+                                [account.user_id]
+                            );
+                        }
+
                         console.error(
                             "Facebook sync error:",
                             apiErr.response?.data || apiErr.message

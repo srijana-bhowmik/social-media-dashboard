@@ -11,7 +11,7 @@ const syncInstagramMetrics = () => {
         try {
             // 1. Get all Instagram accounts from DB
             db.query(
-                "SELECT * FROM social_accounts WHERE platform = 'instagram'",
+                "SELECT * FROM social_accounts WHERE platform = 'instagram' and status = 'active'",
                 async (err, accounts) => {
                     if (err) {
                         console.error("DB error:", err);
@@ -56,11 +56,26 @@ const syncInstagramMetrics = () => {
                                 `INSERT INTO social_metrics 
                                 (account_id, followers, likes_count, comments_count, shares_count) 
                                 VALUES (?, ?, ?, ?, ?)`,
-                                [account_id, followers, likes, comments, 0]
+                                [account_id, followers, likes, comments, null]
                             );
 
                         } catch (apiErr) {
-                            console.error("IG sync error:", apiErr.response?.data || apiErr.message);
+                            if (
+                                apiErr.response?.status === 400 ||
+                                apiErr.response?.status === 401
+                            ) {
+                                db.query(
+                                    `UPDATE social_accounts
+                                    SET status = 'expired'
+                                    WHERE user_id = ?
+                                    AND (platform = 'facebook' OR platform = 'instagram')`,
+                                    [account.user_id]
+                                );
+                            }
+                            console.error(
+                                "IG sync error:",
+                                apiErr.response?.data || apiErr.message
+                            );
                         }
                     }
                 }

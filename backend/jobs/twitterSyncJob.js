@@ -9,7 +9,7 @@ const syncTwitterMetrics = () => {
         console.log("🐦 Running Twitter sync job...");
 
         db.query(
-            "SELECT * FROM social_accounts WHERE platform = 'twitter'",
+            "SELECT * FROM social_accounts WHERE platform = 'twitter' and status = 'active'",
             async (err, accounts) => {
 
                 if (err) {
@@ -50,19 +50,24 @@ const syncTwitterMetrics = () => {
                             [
                                 account_id,
                                 followers,
-                                0,
-                                0,
-                                0
+                                null,
+                                null,
+                                null
                             ]
                         ); 
 
                     } catch (apiErr) {
-
-                        console.error(
-                            "Twitter sync error:",
-                            apiErr.response?.data ||
-                            apiErr.message
-                        );
+                        if (
+                            apiErr.response?.status === 400 ||
+                            apiErr.response?.status === 401
+                        ) {
+                            db.query(
+                                `UPDATE social_accounts
+                                SET status = 'expired'
+                                WHERE id = ?`,
+                                [account_id]
+                            );
+                        }
                     }
                 }
             }

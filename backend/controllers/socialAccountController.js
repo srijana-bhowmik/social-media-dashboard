@@ -66,33 +66,65 @@ const deleteSocialAccount = (req, res) => {
     const { id } = req.params;
 
     db.query(
-        "DELETE FROM social_metrics WHERE account_id = ?",
+        `SELECT user_id, platform
+         FROM social_accounts
+         WHERE id = ?`,
         [id],
-        (err) => {
+        (err, rows) => {
 
-            if (err) {
-                console.error(err);
-
+            if (err || rows.length === 0) {
                 return res.status(500).json({
                     message: "Database error"
                 });
             }
 
+            const { user_id, platform } = rows[0];
+
+            // FB and IG are linked
+            if (
+                platform === "facebook" ||
+                platform === "instagram"
+            ) {
+
+                db.query(
+                    `UPDATE social_accounts
+                     SET status = 'expired'
+                     WHERE user_id = ?
+                     AND platform IN ('facebook','instagram')`,
+                    [user_id],
+                    (err) => {
+
+                        if (err) {
+                            return res.status(500).json({
+                                message: "Database error"
+                            });
+                        }
+
+                        return res.status(200).json({
+                            message: "Account disconnected successfully"
+                        });
+                    }
+                );
+
+                return;
+            }
+
+            // Twitter
             db.query(
-                "DELETE FROM social_accounts WHERE id = ?",
+                `UPDATE social_accounts
+                 SET status = 'expired'
+                 WHERE id = ?`,
                 [id],
                 (err) => {
 
                     if (err) {
-                        console.error(err);
-
                         return res.status(500).json({
                             message: "Database error"
                         });
                     }
 
                     res.status(200).json({
-                        message: "Account deleted successfully"
+                        message: "Account disconnected successfully"
                     });
                 }
             );

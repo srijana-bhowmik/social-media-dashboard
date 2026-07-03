@@ -49,9 +49,9 @@ const MetricsTable = ({accountId}) => {
                                 {new Date(metric.recorded_at).toLocaleDateString()}
                             </td>
                             <td className="p-3">{metric.followers}</td>
-                            <td className="p-3">{metric.likes_count}</td>
-                            <td className="p-3">{metric.comments_count}</td>
-                            <td className="p-3">{metric.shares_count}</td>
+                            <td className="p-3">{metric.likes_count??"N/A"}</td>
+                            <td className="p-3">{metric.comments_count??"N/A"}</td>
+                            <td className="p-3">{metric.shares_count??"N/A"}</td>
                             </tr>
                         ))} 
                     </tbody>

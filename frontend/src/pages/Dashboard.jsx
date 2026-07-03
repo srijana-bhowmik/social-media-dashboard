@@ -184,6 +184,9 @@ const Dashboard=()=>{
             </div>
             <div className="pl-14 pr-14" >
                 <MetricsTable accountId={selectedAccount}/>
+                <p className="text-xs text-red-500 mb-2">
+                    ⚠️ N/A = Metric not provided by the platform API.
+                </p>
             </div>
             <div className="flex justify-center ">
                 <PlatformComparisonChart/>

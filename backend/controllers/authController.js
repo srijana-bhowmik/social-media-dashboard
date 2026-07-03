@@ -337,60 +337,83 @@ const facebookCallback = async (req, res) => {
         console.log(igProfileRes.data);
         const username = igProfileRes.data.username;
         db.query(
-            `INSERT INTO social_accounts
-            (user_id, platform, account_name, ig_id, access_token, page_id)
-            VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-                user_id,
-                "facebook",
-                page.name,
-                igId,
-                pageAccessToken,
-                pageId
-            ], 
-            (err, result) => {
+            `SELECT * FROM social_accounts
+            WHERE user_id = ?
+            AND platform = 'facebook'
+            AND page_id = ?`,
+            [user_id, pageId],
+            (err, rows) => {
 
                 if (err) {
-                    if (err.code === "ER_DUP_ENTRY") {
-                        return res.redirect(
-                            "http://localhost:5173/accounts"
-                        );
-                    }
-
                     return res.status(500).json({
                         message: "Database error"
                     });
                 }
 
+                if (rows.length > 0) {
+
+                    db.query(
+                        `UPDATE social_accounts
+                        SET access_token = ?,
+                            account_name = ?,
+                            status = 'active'
+                        WHERE id = ?`,
+                        [
+                            pageAccessToken,
+                            page.name,
+                            rows[0].id
+                        ]
+                    );
+
+                    db.query(
+                        `UPDATE social_accounts
+                        SET access_token = ?,
+                            account_name = ?,
+                            status = 'active'
+                        WHERE user_id = ?
+                        AND platform = 'instagram'
+                        AND ig_id = ?`,
+                        [
+                            pageAccessToken,
+                            username,
+                            user_id,
+                            igId
+                        ]
+                    );
+
+                    return res.redirect(
+                        "http://localhost:5173/accounts"
+                    );
+                }
+
+                // INSERT facebook
                 db.query(
                     `INSERT INTO social_accounts
-                    (user_id, platform, account_name, ig_id, access_token, page_id)
-                    VALUES (?, ?, ?, ?, ?, ?)`,
+                    (user_id, platform, account_name, page_id, access_token, status)
+                    VALUES (?, 'facebook', ?, ?, ?, 'active')`,
                     [
                         user_id,
-                        "instagram",
+                        pageName,
+                        pageId,
+                        pageAccessToken
+                    ]
+                );
+                // INSERT instagram
+                db.query(
+                    `INSERT INTO social_accounts
+                    (user_id, platform, account_name, ig_id,page_id, access_token, status)
+                    VALUES (?, 'instagram', ?, ?,?, ?, 'active')`,
+                    [
+                        user_id,
                         username,
                         igId,
-                        pageAccessToken,
-                        pageId
-                    ],
-                    (igErr) => {
-
-                        if (
-                            igErr &&
-                            igErr.code !== "ER_DUP_ENTRY"
-                        ) {
-                            console.log(igErr);
-                        }
-
-                        res.redirect(
-                            "http://localhost:5173/accounts"
-                        );
-                    }
-                ); 
+                        pageId,
+                        pageAccessToken
+                    ]
+                );
+                return res.redirect( "http://localhost:5173/accounts");
             }
         );
-
 
     } catch (error) {
 
@@ -495,13 +518,10 @@ const twitterCallback = async (req, res) => {
         console.log( "TWITTER TOKEN:" );
         console.log(tokenRes.data );
         const accessToken = tokenRes.data.access_token;
+        const refreshToken = tokenRes.data.refresh_token;
         // console.log("ACCESS TOKEN SAVED:");
         // console.log(accessToken);
-
-        db.query(
-            `UPDATE social_accounts SET access_token = ? WHERE platform = 'twitter' AND user_id = ?`,
-            [accessToken, user_id]
-        );
+ 
         const profileRes =
             await axios.get(
                 "https://api.twitter.com/2/users/me",
@@ -519,37 +539,84 @@ const twitterCallback = async (req, res) => {
         const twitterId=profileRes.data.data.id;
         const username=profileRes.data.data.username;
         db.query(
-            `INSERT INTO social_accounts
-            (user_id, platform, account_name, twitter_id, access_token)
-            VALUES (?, ?, ?, ?, ?)`,
-            [
-                user_id,
-                "twitter",
-                username,
-                twitterId,
-                accessToken
-            ],
-            (err) => { 
-                if (err) {
-                    if (err.code === "ER_DUP_ENTRY") {
-                        return res.redirect(
-                            "http://localhost:5173/accounts"
-                        );
-                    }
-                    console.log(err);
+            `SELECT * FROM social_accounts
+            WHERE user_id = ?
+            AND platform = 'twitter'
+            AND twitter_id = ?`,
+            [user_id, twitterId],
+            (err, rows) => {
 
+                if (err) {
                     return res.status(500).json({
                         message: "Database error"
                     });
                 }
-                res.redirect(
-                    "http://localhost:5173/accounts"
-                );
-            }
-        );
 
-        console.log("TWITTER PROFILE:");
-        console.log(profileRes.data); 
+            if (rows.length > 0) {
+
+                db.query(
+                    `UPDATE social_accounts
+                    SET access_token = ?,
+                        refresh_token = ?,
+                        status = 'active'
+                    WHERE id = ?`,
+                    [
+                        accessToken,
+                        refreshToken,
+                        rows[0].id
+                    ],
+                    (updateErr) => {
+
+                        if (updateErr) {
+                            return res.status(500).json({
+                                message: "Database error"
+                            });
+                        }
+
+                        return res.redirect(
+                            "http://localhost:5173/accounts"
+                        );
+                    }
+                );
+
+                return;
+            }
+
+            db.query(
+                `INSERT INTO social_accounts
+                (user_id, platform, account_name, twitter_id, access_token, refresh_token, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    user_id,
+                    "twitter",
+                    username,
+                    twitterId,
+                    accessToken,
+                    refreshToken,
+                    "active"
+                ],
+                (err) => { 
+                    if (err) {
+                        if (err.code === "ER_DUP_ENTRY") {
+                            return res.redirect(
+                                "http://localhost:5173/accounts"
+                            );
+                        }
+                        console.log(err);
+
+                        return res.status(500).json({
+                            message: "Database error"
+                        });
+                    }
+                    res.redirect(
+                        "http://localhost:5173/accounts"
+                    );
+                }
+            );
+        }
+    );   
+    console.log("TWITTER PROFILE:");
+    console.log(profileRes.data); 
 
     } catch (error) {
 
@@ -566,53 +633,14 @@ const twitterCallback = async (req, res) => {
     }
 };
 
-// const twitterTest = async (req, res) => {
-//     try {
-
-//         const token =
-//         "PASTE_THE_ACCESS_TOKEN_FROM_DB_HERE";
-
-//         const profileRes =
-//         await axios.get(
-//             "https://api.twitter.com/2/users/me",
-//             {
-//                 headers: {
-//                     Authorization:
-//                         `Bearer ${token}`
-//                 },
-//                 params: {
-//                     "user.fields":
-//                         "public_metrics"
-//                 }
-//             }
-//         );
-
-//         res.json(profileRes.data);
-
-//     } catch (error) {
-
-//         console.log(
-//             error.response?.data ||
-//             error.message
-//         );
-
-//         res.status(500).json(
-//             error.response?.data ||
-//             error.message
-//         );
-//     }
-// };
 
 module.exports = {
     register,
     login,
     verifyOTP,
-    resendOTP,
-    // instagramLogin,
-    // instagramCallback,
+    resendOTP, 
     facebookLogin,
     facebookCallback,
     twitterLogin,
-    twitterCallback
-    // twitterTest
+    twitterCallback 
 };
