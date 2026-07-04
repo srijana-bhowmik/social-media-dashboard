@@ -15,15 +15,14 @@ const syncTwitterMetrics = () => {
                 if (err) {
                     console.error("DB error:", err);
                     return;
-                }
-
+                } 
                 for (const account of accounts) { 
-                    try { 
-                        const {
+                     const {
                             access_token,
                             twitter_id,
                             id: account_id
                         } = account;
+                    try {  
                         console.log("TWITTER ACCOUNT:");
                         console.log(account);
                         const profileRes = await axios.get(

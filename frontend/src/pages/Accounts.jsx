@@ -94,6 +94,11 @@ console.log(
                                         Delete
                                     </button>
                                 )} 
+                                {account.platform === "instagram" && (
+                                    <p className="text-yellow-300 text-xs mt-2">
+                                        Delete FaceBook to delete this account
+                                    </p>
+                                )} 
                             </div>
                         ))}
                     </div>
