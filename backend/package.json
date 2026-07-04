@@ -23,6 +23,7 @@
     "mysql2": "^3.22.5",
     "no": "^0.0.1",
     "node-cron": "^4.5.0",
+    "nodemailer": "^9.0.3",
     "oauth": "^0.10.2"
   },
   "devDependencies": {
