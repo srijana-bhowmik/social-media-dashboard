@@ -9,6 +9,7 @@ import Accounts from './pages/Accounts'
 // import {jwtDecode} from "jwt-decode";
 import NotFound from './pages/NotFound'
 import VerifyOTP from './pages/VerifyOTP'
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 const App = () => {
@@ -19,9 +20,9 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
-        <Route path="/dashboard" element={<Dashboard />} /> 
-        <Route path="/add-account" element={<AddAccount />} /> 
-        <Route path="/accounts" element={<Accounts />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute> } /> 
+        <Route path="/add-account" element={<ProtectedRoute><AddAccount /></ProtectedRoute> } /> 
+        <Route path="/accounts" element={ <ProtectedRoute><Accounts /></ProtectedRoute> } />
         <Route path="*" element={<NotFound />} />
     </Routes>
   );
