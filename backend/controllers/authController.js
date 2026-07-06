@@ -253,7 +253,7 @@ const facebookLogin = (req, res) => {
     const appId = process.env.META_APP_ID;
 
     const redirectUri =
-        "http://localhost:3000/api/auth/facebook/callback";
+        "https://social-media-dashboard-cvh5.onrender.com/api/auth/facebook/callback";
 
     const scope =
         "pages_show_list,pages_read_engagement,pages_read_user_content,read_insights,business_management";
@@ -284,7 +284,7 @@ const facebookCallback = async (req, res) => {
                     client_id: process.env.META_APP_ID,
                     client_secret: process.env.META_APP_SECRET,
                     redirect_uri:
-                        "http://localhost:3000/api/auth/facebook/callback",
+                        "https://social-media-dashboard-cvh5.onrender.com/api/auth/facebook/callback",
                     code
                 }
             }
