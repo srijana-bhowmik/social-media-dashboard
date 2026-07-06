@@ -12,16 +12,18 @@ const transporter = nodemailer.createTransport({
 
 const sendVerificationEmail = async (to, subject, html) => {
     try {
-        await transporter.sendMail({
+        console.log("Attempting email to:", to);
+
+        const info = await transporter.sendMail({
             from: `"Social Dashboard" <${process.env.BREVO_USER}>`,
             to,
             subject,
             html
         });
 
-        console.log(" Email sent to:", to);
+        console.log("Email sent:", info.messageId);
     } catch (error) {
-        console.log("Email error:", error.message);
+        console.log("Email error:", error);
     }
 };
 
