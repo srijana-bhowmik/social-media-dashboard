@@ -5,7 +5,7 @@ const AddAccount = () => {
 
     // const handleInstagramLogin = () => {
     //     window.location.href =
-    //         "http://localhost:3000/api/auth/instagram";
+    //         "https://social-media-dashboard-cvh5.onrender.com/api/auth/instagram";
     // };
 
    const handleFacebookLogin = () => {
@@ -14,7 +14,7 @@ const AddAccount = () => {
         console.log("LOCAL TOKEN:", token);
 
         const url =
-            `http://localhost:3000/api/auth/facebook?token=${token}`;
+            `https://social-media-dashboard-cvh5.onrender.com/api/auth/facebook?token=${token}`;
 
         console.log("REDIRECT URL:", url);
 
@@ -22,7 +22,7 @@ const AddAccount = () => {
     };
     const connectTwitter=()=>{
         const token=localStorage.getItem("token");
-        window.location.href=`http://localhost:3000/api/auth/twitter?token=${token}`;
+        window.location.href=`https://social-media-dashboard-cvh5.onrender.com/api/auth/twitter?token=${token}`;
     }
 
     return (

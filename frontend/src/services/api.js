@@ -1,6 +1,6 @@
 import axios from "axios";     //importing axios library to make HTTP requests
 
-const API = axios.create({      //Creates a customized Axios object, every request automatically starts with: http://localhost:3000/api
+const API = axios.create({      //Creates a customized Axios object, every request automatically starts with: https://social-media-dashboard-cvh5.onrender.com/api
     baseURL: "https://social-media-dashboard-cvh5.onrender.com/api"        // this is API instance
 });
 
