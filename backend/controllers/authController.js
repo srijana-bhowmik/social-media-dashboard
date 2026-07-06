@@ -7,7 +7,7 @@ const generateOTP = require("../utils/generateOTP");
 const crypto=require('crypto');
 
 // Register a new user-- post in postman
-//  created API in postman: http://localhost:3000/api/auth/register
+//  created API in postman: https://social-media-dashboard-cvh5.onrender.com/api/auth/register
 const register = async (req, res) => {      //every new user who registers is a viewer automatically
     try {
         const { name, email, password } = req.body;
@@ -382,7 +382,7 @@ const facebookCallback = async (req, res) => {
                     );
 
                     return res.redirect(
-                        "http://localhost:5173/accounts"
+                        "https://social-media-dashboard-six-tan.vercel.app/accounts"
                     );
                 }
 
@@ -411,7 +411,7 @@ const facebookCallback = async (req, res) => {
                         pageAccessToken
                     ]
                 );
-                return res.redirect( "http://localhost:5173/accounts");
+                return res.redirect( "https://social-media-dashboard-six-tan.vercel.app/accounts");
             }
         );
 
@@ -574,7 +574,7 @@ const twitterCallback = async (req, res) => {
                         }
 
                         return res.redirect(
-                            "http://localhost:5173/accounts"
+                            "https://social-media-dashboard-six-tan.vercel.app/accounts"
                         );
                     }
                 );
@@ -599,7 +599,7 @@ const twitterCallback = async (req, res) => {
                     if (err) {
                         if (err.code === "ER_DUP_ENTRY") {
                             return res.redirect(
-                                "http://localhost:5173/accounts"
+                                "https://social-media-dashboard-six-tan.vercel.app/accounts"
                             );
                         }
                         console.log(err);
@@ -609,7 +609,7 @@ const twitterCallback = async (req, res) => {
                         });
                     }
                     res.redirect(
-                        "http://localhost:5173/accounts"
+                        "https://social-media-dashboard-six-tan.vercel.app/accounts"
                     );
                 }
             );
