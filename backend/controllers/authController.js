@@ -55,7 +55,7 @@ const register = async (req, res) => {      //every new user who registers is a 
                             return res.status(500).json(err);
                         }
 
-                        await sendVerificationEmail(
+                        sendVerificationEmail(
                             email,
                             "Verify your account",
                             `
@@ -149,7 +149,7 @@ const resendOTP = async (req, res) => {
                     return res.status(500).json(err);
                 }
 
-                await sendVerificationEmail(
+                sendVerificationEmail(
                     email,
                     "Verify your account",
                     `
