@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 const sendVerificationEmail = async (to, subject, html) => {
     try {
         await transporter.sendMail({
-            from: `"Social Dashboard" <${process.env.EMAIL_USER}>`,
+            from: `"Social Dashboard" <${process.env.BREVO_USER}>`,
             to,
             subject,
             html
