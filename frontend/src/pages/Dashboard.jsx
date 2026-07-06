@@ -165,6 +165,7 @@ const Dashboard=()=>{
             )}
             
             <div className="p-8">
+                <p className="text-s text-red-500 mb-2">⚠️ Please check if all your accounts are connected before proceeding.</p>
                 <h2 className="text-slate-300 text-xl mb-6">
                     Overview
                 </h2>
