@@ -5,7 +5,7 @@ const db = require("../config/db");
 const FB_API_BASE = "https://graph.facebook.com/v25.0";
 
 const syncFacebookMetrics = () => {
-    cron.schedule("*/1 * * * *", async () => {
+    cron.schedule("0 0 * * *", async () => {
         console.log("Running Facebook sync job...");
 
         db.query(

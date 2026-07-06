@@ -5,8 +5,8 @@ const db = require("../config/db");
 const IG_API_BASE = "https://graph.facebook.com/v25.0";
 
 const syncInstagramMetrics = () => {
-    cron.schedule("*/1 * * * *", async () => {
-        console.log("🔄 Running Instagram sync job...");
+    cron.schedule("0 0 * * *", async () => {
+        console.log(" Running Instagram sync job...");
 
         try {
             // 1. Get all Instagram accounts from DB

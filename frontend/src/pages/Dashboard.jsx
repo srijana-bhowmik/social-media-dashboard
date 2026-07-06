@@ -28,66 +28,7 @@ const Dashboard=()=>{
     const [accounts, setAccounts] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState("");
     
-
-
-    // const fetchInstagramLive = async (accountId, igId, token) => {
-    //     try {
-    //         const res = await API.post(
-    //             "/metrics/instagram/fetch",
-    //             {
-    //                 account_id: accountId,
-    //                 ig_id: igId,
-    //                 access_token: token
-    //             },
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${token}`
-    //                 }
-    //             }
-    //         );
-
-    //         return res.data.data; // { followers, likes, comments }
-    //     } catch (err) {
-    //         console.log("Instagram fetch error:", err);
-    //         return null;
-    //     }
-    // };
-
-    //updates followers,likes,comments every 30 seconds
-    // useEffect(() => {
-    //     const loadInstagramData = async () => {
-    //         if (!selectedAccount) return;
-    //         if (!accounts || accounts.length === 0) return;
-
-    //         const account = accounts.find(a => String(a.id) === String(selectedAccount));
-    //         if (!account?.ig_id) return;
-
-    //         const token = localStorage.getItem("token");
-
-    //         const data = await fetchInstagramLive(
-    //             account.id,
-    //             account.ig_id,
-    //             token
-    //         );
-
-    //         if (data) {
-    //             setLiveMetrics({
-    //                 totalFollowers: data.followers,
-    //                 totalLikes: data.likes,
-    //                 totalComments: data.comments
-    //             });
-    //         }
-    //     };
-
-    //     loadInstagramData(); // initial call
-
-    //     const interval = setInterval(() => {
-    //         loadInstagramData(); // auto refresh
-    //     }, 30000); // 30 seconds
-
-    //     return () => clearInterval(interval);
-    // }, [selectedAccount, accounts]);
-   
+ 
     useEffect(() => {
 
         const fetchSummary = async () => {

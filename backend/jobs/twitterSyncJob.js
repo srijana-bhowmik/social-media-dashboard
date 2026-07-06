@@ -4,9 +4,9 @@ const db = require("../config/db");
 
 const syncTwitterMetrics = () => {
 
-    cron.schedule("*/1 * * * *", async () => {
+    cron.schedule("0 0 * * *", async () => {
 
-        console.log("🐦 Running Twitter sync job...");
+        console.log("Running Twitter sync job...");
 
         db.query(
             "SELECT * FROM social_accounts WHERE platform = 'twitter' and status = 'active'",
