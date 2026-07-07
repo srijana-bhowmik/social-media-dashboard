@@ -28,8 +28,31 @@ const register = async (req, res) => {      //every new user who registers is a 
                 }
 
                 if (result.length > 0) {
-                    return res.status(400).json({
-                        message: "User already exists"
+                    const user = result[0];
+                    if (user.is_verified) {
+                        return res.status(400).json({
+                            message: "User already exists"
+                        });
+                    }
+                    // user exists but not verified
+                    const otp = generateOTP();
+                    const expiry = new Date(
+                        Date.now() + 5 * 60 * 1000
+                    );
+                    db.query(
+                        `UPDATE users
+                        SET otp = ?, otp_expires = ?
+                        WHERE email = ?`,
+                        [otp, expiry, email]
+                    );
+                    sendVerificationEmail(
+                        email,
+                        "Verify your account",
+                        `<h1>${otp}</h1>`
+                    );
+
+                    return res.status(200).json({
+                        message: "New OTP sent"
                     });
                 }
 
