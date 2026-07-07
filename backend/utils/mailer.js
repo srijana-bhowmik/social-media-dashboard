@@ -9,6 +9,13 @@ const transporter = nodemailer.createTransport({
         pass: process.env.BREVO_PASS
     }
 });
+transporter.verify(function (error, success) {
+    if (error) {
+        console.log("SMTP Verify Error:", error);
+    } else {
+        console.log("SMTP Server is ready");
+    }
+});
 
 const sendVerificationEmail = async (to, subject, html) => {
     try {
