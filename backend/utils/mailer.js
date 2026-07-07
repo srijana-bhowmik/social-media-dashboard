@@ -31,14 +31,54 @@
 //     sendVerificationEmail
 // };
 
-const brevo = require("@getbrevo/brevo");
+// const brevo = require("@getbrevo/brevo");
 
-const apiInstance = new brevo.TransactionalEmailsApi();
+// const apiInstance = new brevo.TransactionalEmailsApi();
 
-apiInstance.setApiKey(
-    brevo.TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY
-);
+// apiInstance.setApiKey(
+//     brevo.TransactionalEmailsApiApiKeys.apiKey,
+//     process.env.BREVO_API_KEY
+// );
+
+// const sendVerificationEmail = async (
+//     to,
+//     subject,
+//     html
+// ) => {
+//     try {
+
+//         await apiInstance.sendTransacEmail({
+//             sender: {
+//                 email: process.env.BREVO_USER,
+//                 name: "Social Dashboard"
+//             },
+
+//             to: [
+//                 {
+//                     email: to
+//                 }
+//             ],
+
+//             subject,
+//             htmlContent: html
+//         });
+
+//         console.log("Email sent to:", to);
+
+//     } catch (error) {
+
+//         console.log(
+//             "Brevo API error:",
+//             error.response?.body || error.message
+//         );
+//     }
+// };
+
+// module.exports = {
+//     sendVerificationEmail
+// };
+
+const axios = require("axios");
 
 const sendVerificationEmail = async (
     to,
@@ -47,29 +87,37 @@ const sendVerificationEmail = async (
 ) => {
     try {
 
-        await apiInstance.sendTransacEmail({
-            sender: {
-                email: process.env.BREVO_USER,
-                name: "Social Dashboard"
+        const response = await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "Social Dashboard",
+                    email: process.env.BREVO_USER
+                },
+                to: [
+                    {
+                        email: to
+                    }
+                ],
+                subject,
+                htmlContent: html
             },
-
-            to: [
-                {
-                    email: to
+            {
+                headers: {
+                    "api-key": process.env.BREVO_API_KEY,
+                    "Content-Type": "application/json"
                 }
-            ],
-
-            subject,
-            htmlContent: html
-        });
+            }
+        );
 
         console.log("Email sent to:", to);
+        console.log(response.data);
 
     } catch (error) {
 
         console.log(
             "Brevo API error:",
-            error.response?.body || error.message
+            error.response?.data || error.message
         );
     }
 };
