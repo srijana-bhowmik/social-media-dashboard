@@ -37,48 +37,60 @@ const FollowersChart = ({
         datasets: []
     });
 
-    useEffect(() => {
-        if (!accountId) return;
+useEffect(() => {
+    if (!accountId) return;
 
-        const fetchMetrics = async () => {
-            try {
-                const token = localStorage.getItem("token");
+    const fetchMetrics = async () => {
+        try {
+            const token = localStorage.getItem("token");
 
-                const res = await API.get(`/metrics/${accountId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
+            const res = await API.get(`/metrics/${accountId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const sorted = res.data.sort(
+                (a, b) =>
+                    new Date(a.recorded_at) -
+                    new Date(b.recorded_at)
+            );
+
+            const labels = sorted.map((item) =>
+                new Date(item.recorded_at).toLocaleDateString()
+            );
+
+            const followers = sorted.map(
+                (item) => item.followers
+            );
+
+            setChartData({
+                labels,
+                datasets: [
+                    {
+                        label: "Followers",
+                        data: followers,
+                        borderColor: "#3B82F6",
+                        tension: 0.4
                     }
-                });
+                ]
+            });
 
-                const sorted = res.data.sort(
-                    (a, b) => new Date(a.recorded_at) - new Date(b.recorded_at)
-                );
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-                const labels = sorted.map((item) =>
-                    new Date(item.recorded_at).toLocaleDateString()
-                );
+    // Fetch immediately when account changes/page loads
+    fetchMetrics();
 
-                const followers = sorted.map((item) => item.followers);
+    // Fetch again every 30 seconds
+    const interval = setInterval(fetchMetrics, 30000);
 
-                setChartData({
-                    labels,
-                    datasets: [
-                        {
-                            label: "Followers",
-                            data: followers,
-                            borderColor: "#3B82F6",
-                            tension: 0.4
-                        }
-                    ]
-                });
+    // Stop interval when component is removed/account changes
+    return () => clearInterval(interval);
 
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchMetrics();
-    }, [accountId]);
+}, [accountId]);
     
 return (
     <div className="bg-slate-800 p-6 h-96 w-1/2 rounded-xl mt-8">
