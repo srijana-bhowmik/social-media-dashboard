@@ -4,7 +4,7 @@ const db = require("../config/db");
 
 const syncTwitterMetrics = () => {
 
-    cron.schedule("0 0 * * *", async () => {
+    cron.schedule("*/1 * * * *", async () => {
 
         console.log("Running Twitter sync job...");
 
