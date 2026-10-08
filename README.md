@@ -146,7 +146,7 @@ Make sure the database credentials match the MySQL configuration in docker-compo
 
 ### 3. Use three terminals:
 
-## Start the application
+#### Start the application
 
 Open Docker Desktop, then run this command from the project root:
 ```bash
@@ -154,12 +154,12 @@ docker compose up --build -d
 ```
 Docker Compose starts the frontend, backend, and MySQL database.
 
-## Open the application
+#### Open the application
 ```bash
 Frontend: http://localhost:5173
 Backend: http://localhost:3000
 ``` 
-## Check logs if needed
+#### Check logs if needed
 ```bash
 docker compose ps
 docker compose logs -f backend
