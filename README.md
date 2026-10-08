@@ -45,7 +45,7 @@ Backend (Node.js + Express)
 MySQL Database
 ↓
 Meta Graph API / Instagram API / Twitter API
-
+```
 ---
 
 ## Tech Stack
@@ -86,14 +86,14 @@ Development Tools
 ``` 
 ---
 
-## Prerequisites
+# Prerequisites
 
 - Node.js and npm
 - Docker Desktop
 - Git
 - Social media developer credentials for integrations you want to test
-
-### How to run the application
+---
+# How to run the application
 
 ## 1. Clone the Repository
 ```bash
