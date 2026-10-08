@@ -1,9 +1,15 @@
 import axios from "axios";     //importing axios library to make HTTP requests
 
-const API = axios.create({      //Creates a customized Axios object, every request automatically starts with: https://social-media-dashboard-cvh5.onrender.com/api
-    baseURL: "https://social-media-dashboard-cvh5.onrender.com/api"        // this is API instance
+const API = axios.create({
+    baseURL: import.meta.env.VITE_API_URL
 });
 
+// Small helper so components don't repeat the Authorization header everywhere
+export const authConfig = () => ({
+    headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+});
 
 // Fetch Instagram metrics (LIVE + DB stored data)
 export const fetchInstagramMetrics = async (data, token) => {

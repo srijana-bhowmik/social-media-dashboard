@@ -1,1 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+
+/* ---------- Design tokens ---------- */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #f2f6f7;
+  --color-ink: #0e2830;
+  --color-ink-soft: #3d5860;
+  --color-muted: #5e767e;
+  --color-line: #e0e9eb;
+
+  --color-petrol-950: #07191e;
+  --color-petrol-900: #0b2a31;
+  --color-petrol-800: #11383f;
+  --color-petrol-700: #1a4b53;
+
+  --color-brand-50: #e7f4f4;
+  --color-brand-100: #cfe9ea;
+  --color-brand-500: #12898f;
+  --color-brand-600: #0d7378;
+  --color-brand-700: #0a5c60;
+
+  --color-sun-100: #fff1d0;
+  --color-sun-500: #f4b63f;
+  --color-sun-700: #7a5000;
+
+  --color-coral-50: #fdece7;
+  --color-coral-500: #ef7a5a;
+  --color-coral-700: #b3412a;
+
+  --color-iris-50: #eceefc;
+  --color-iris-500: #5967c9;
+
+  --color-mint-50: #e3f6ef;
+  --color-mint-500: #34b78f;
+  --color-mint-700: #1b7a5c;
+
+  --shadow-card: 0 1px 2px rgb(14 40 48 / 0.04), 0 12px 28px -16px rgb(14 40 48 / 0.18);
+  --shadow-lift: 0 24px 48px -20px rgb(14 40 48 / 0.4);
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- Motion that answers an action ---------- */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-pop {
+  animation: pop 0.2s ease-out both;
+}
+.animate-fade {
+  animation: fade 0.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

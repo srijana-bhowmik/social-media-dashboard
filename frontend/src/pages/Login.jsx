@@ -1,83 +1,79 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../services/api";
+import AuthShell from "../components/AuthShell";
+import TextField from "../components/TextField";
+import Button from "../components/Button";
+import Notice from "../components/Notice";
 
-const Login=()=>{
+const Login = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const notice = location.state?.notice;
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError("");
+        setLoading(true);
         try {
             const res = await API.post("/auth/login", { email, password });
             localStorage.setItem("token", res.data.token);
             navigate("/dashboard");
         }
-        catch (error) {
-          console.log(error);
-
-          alert(
-              error.response?.data?.message ||
-              "Login failed"
-          );
-      }
+        catch (err) {
+            console.log(err);
+            setError(err.response?.data?.message || "Login failed. Check your details and try again.");
+        }
+        finally {
+            setLoading(false);
+        }
     };
 
-
-return (
-  <div className="min-h-screen bg-black flex items-center justify-center">
-
-    <div className="bg-slate-800 p-8 rounded-2xl shadow-xl w-96">
-
-      <h1 className="text-3xl font-bold text-white mb-2">
-        Social Dashboard
-      </h1>
-
-      <p className="text-slate-400 mb-6">
-        Sign in to continue
-      </p>
-
-      <form onSubmit={handleLogin}>
-
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-3 mb-4 rounded-lg bg-slate-700 text-white outline-none"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-3 mb-4 rounded-lg bg-slate-700 text-white outline-none"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition"
+    return (
+        <AuthShell
+            title="Welcome back"
+            subtitle="Sign in to see how your accounts are doing."
+            footer={
+                <>
+                    New here?{" "}
+                    <Link to="/register" className="font-semibold text-brand-600 hover:text-brand-700">
+                        Create an account
+                    </Link>
+                </>
+            }
         >
-          Login
-        </button>
-        <p className="text-slate-400 text-center mt-4">
-          Don't have an account?
+            <form onSubmit={handleLogin} className="space-y-5">
+                {notice && !error && <Notice kind="success">{notice}</Notice>}
+                {error && <Notice kind="error">{error}</Notice>}
 
-          <span
-              onClick={() => navigate("/register")}
-              className="text-blue-500 cursor-pointer ml-2"
-          >
-              Register
-          </span>
-      </p>
+                <TextField
+                    label="Email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    label="Password"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="Your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
 
-      </form>
+                <Button type="submit" loading={loading} className="w-full">
+                    {loading ? "Signing in…" : "Sign in"}
+                </Button>
+            </form>
+        </AuthShell>
+    );
+};
 
-    </div>
-
-  </div>
-)
-}
-
-export default Login
+export default Login;

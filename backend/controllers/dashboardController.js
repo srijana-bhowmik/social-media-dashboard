@@ -16,7 +16,7 @@ const getDashboardSummary = (req, res) => {
             SELECT id
             FROM social_metrics
             WHERE account_id = sa.id
-            ORDER BY recorded_at DESC
+            ORDER BY recorded_at DESC      
             LIMIT 1
         )
         WHERE sa.user_id = ?

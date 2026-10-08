@@ -1,6 +1,5 @@
-import React from 'react'
-import {useEffect, useState} from 'react'
-import API from '../services/api'
+import { useEffect, useState } from 'react'
+import API, { authConfig } from '../services/api'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -11,6 +10,12 @@ import {
     Legend
 } from "chart.js";
 import { Bar } from 'react-chartjs-2';
+import ChartCard from "./ChartCard";
+import EmptyState, { Skeleton } from "./EmptyState";
+import { Icon } from "./Icons";
+import { formatCompact, formatNumber, platformMeta } from "../utils/format";
+import { gridColor, tooltipStyle } from "../utils/chartTheme";
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -20,81 +25,92 @@ ChartJS.register(
     Legend
 );
 
-const PlatformComparisonChart = () => {
-    const [chartData,setChartData]=useState({
-        labels:[],
-        datasets:[]
-    })
+const PlatformComparisonChart = ({ className = "" }) => {
+    const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        const fetchComparison=async ()=>{
-            try{
-                const token=localStorage.getItem("token");
-                const res=await API.get(`/dashboard/platform-comparison`,{
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                const labels = res.data.map(
-                    item => item.platform
+    useEffect(() => {
+        const fetchComparison = async () => {
+            try {
+                const res = await API.get(`/dashboard/platform-comparison`, authConfig());
+                setRows(
+                    res.data.map((item, index) => ({
+                        ...platformMeta(item.platform, index),
+                        followers: Number(item.followers) || 0
+                    }))
                 );
-
-                const followers = res.data.map(
-                    item => item.followers
-                );
-
-                setChartData({
-                    labels,
-                    datasets:[
-                        {
-                            label: "Followers",
-                            data: followers,
-                            backgroundColor: "#3B82F6" 
-                        }
-                    ]
-                });
             }
-            catch(error){
+            catch (error) {
                 console.log(error);
+            }
+            finally {
+                setLoading(false);
             }
         }
         fetchComparison();
-    },[]);
-  return (
-    <>
-      <div className="bg-slate-800 rounded-xl p-6 mt-8 w-1/2">
-            <h2 className="text-white text-xl font-bold mb-4">
-                Followers by Platform
-            </h2>
+    }, []);
 
-            <Bar
-                data={chartData}
-                options={{
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: "white"
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: "white"
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                color: "white"
-                            }
-                        }
-                    }
-                }}
+    const data = {
+        labels: rows.map((row) => row.label),
+        datasets: [
+            {
+                label: "Followers",
+                data: rows.map((row) => row.followers),
+                backgroundColor: rows.map((row) => row.color),
+                borderRadius: 10,
+                borderSkipped: false,
+                maxBarThickness: 56
+            }
+        ]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                ...tooltipStyle,
+                displayColors: false,
+                callbacks: {
+                    label: (item) => `${formatNumber(item.parsed.y)} followers`
+                }
+            }
+        },
+        scales: {
+            x: { grid: { display: false }, border: { display: false } },
+            y: {
+                grid: { color: gridColor },
+                border: { display: false },
+                ticks: { maxTicksLimit: 5, callback: (value) => formatCompact(value) }
+            }
+        }
+    };
+
+    let body;
+    if (loading) {
+        body = <Skeleton className="h-64" />;
+    } else if (rows.length === 0) {
+        body = (
+            <EmptyState
+                icon={Icon.Users}
+                title="Nothing to compare yet"
+                message="Connect more than one platform to see them side by side."
             />
-        </div>
-    </>
-  )
+        );
+    } else {
+        body = (
+            <div className="h-64">
+                <Bar data={data} options={options} />
+            </div>
+        );
+    }
+
+    return (
+        <ChartCard className={className} title="Followers by platform" subtitle="How your platforms stack up">
+            {body}
+        </ChartCard>
+    );
 }
 
 export default PlatformComparisonChart

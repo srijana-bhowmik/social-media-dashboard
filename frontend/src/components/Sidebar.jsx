@@ -1,20 +1,69 @@
-import { Link } from "react-router-dom";
-// import {jwtDecode} from "jwt-decode"        //Its purpose is to read the data stored inside a JWT token on the frontend.
+import { NavLink, Link } from "react-router-dom";
+import Logo from "./Logo";
+import RippleArt from "./RippleArt";
+import { Icon } from "./Icons";
+
+const items = [
+    { to: "/dashboard", label: "Dashboard", icon: Icon.Dashboard },
+    { to: "/accounts", label: "Accounts", icon: Icon.Link },
+    { to: "/add-account", label: "Add account", icon: Icon.Plus },
+];
 
 const Sidebar = ({ closeSidebar }) => {
-    // const token = localStorage.getItem("token");
-    // const user=token?jwtDecode(token):null;
-    return ( 
-        <div className="w-64 min-h-screen bg-slate-800 text-white p-6">
-            <h1 className="text-2xl font-bold mb-8">
-                Social Dashboard
-            </h1>
+    return (
+        <div className="relative flex h-full flex-col overflow-hidden bg-petrol-900 px-5 py-6 text-white">
+            <RippleArt className="pointer-events-none absolute -bottom-28 -left-28 w-80 text-brand-100/10" />
 
-            <div className="flex flex-col gap-4">
-                <Link to="/dashboard" onClick={closeSidebar} className="hover:bg-slate-700 p-1 pl-2 rounded">Dashboard</Link>
-                <Link to="/add-account" onClick={closeSidebar} className="hover:bg-slate-700 p-1 pl-2 rounded">Add Account</Link>
-                {/* <Link to="/add-metrics">Add Metrics</Link>   */}
-                <Link to="/accounts" onClick={closeSidebar} className="hover:bg-slate-700 p-1 pl-2 rounded">Accounts</Link>
+            <div className="relative flex items-center justify-between px-2">
+                <Logo />
+                {closeSidebar && (
+                    <button
+                        onClick={closeSidebar}
+                        aria-label="Close menu"
+                        className="grid size-9 place-items-center rounded-lg text-white/70 transition hover:bg-white/10 hover:text-white lg:hidden"
+                    >
+                        <Icon.Close className="size-5" />
+                    </button>
+                )}
+            </div>
+
+            <nav className="relative mt-10 flex flex-col gap-1.5" aria-label="Main">
+                {items.map(({ to, label, icon: IconCmp }) => (
+                    <NavLink
+                        key={to}
+                        to={to}
+                        onClick={closeSidebar}
+                        className={({ isActive }) =>
+                            `group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition ${
+                                isActive
+                                    ? "bg-white/12 text-white"
+                                    : "text-brand-100/75 hover:bg-white/6 hover:text-white"
+                            }`
+                        }
+                    >
+                        {({ isActive }) => (
+                            <>
+                                <IconCmp className={`size-5 ${isActive ? "text-sun-500" : ""}`} />
+                                {label}
+                            </>
+                        )}
+                    </NavLink>
+                ))}
+            </nav>
+
+            <div className="relative mt-auto rounded-2xl bg-white/8 p-4 ring-1 ring-white/10">
+                <p className="text-sm font-semibold text-white">Keep your data fresh</p>
+                <p className="mt-1 text-sm leading-relaxed text-brand-100/75">
+                    Accounts marked as expired need to be reconnected to keep updating.
+                </p>
+                <Link
+                    to="/accounts"
+                    onClick={closeSidebar}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-sun-500 transition hover:text-white"
+                >
+                    Review accounts
+                    <Icon.ArrowRight className="size-4" />
+                </Link>
             </div>
         </div>
     );

@@ -293,8 +293,7 @@ const facebookLogin = (req, res) => {
 
     const appId = process.env.META_APP_ID;
 
-    const redirectUri =
-        "https://social-media-dashboard-cvh5.onrender.com/api/auth/facebook/callback";
+    const redirectUri = "http://localhost:3000/api/auth/facebook/callback";
 
     const scope =
         "pages_show_list,pages_read_engagement,pages_read_user_content,read_insights,business_management";
@@ -324,8 +323,7 @@ const facebookCallback = async (req, res) => {
                 params: {
                     client_id: process.env.META_APP_ID,
                     client_secret: process.env.META_APP_SECRET,
-                    redirect_uri:
-                        "https://social-media-dashboard-cvh5.onrender.com/api/auth/facebook/callback",
+                    redirect_uri: "http://localhost:3000/api/auth/facebook/callback",
                     code
                 }
             }
@@ -422,9 +420,7 @@ const facebookCallback = async (req, res) => {
                         ]
                     );
 
-                    return res.redirect(
-                        "https://social-media-dashboard-six-tan.vercel.app/accounts"
-                    );
+                    return res.redirect("http://localhost:5174/accounts");
                 }
 
                 // INSERT facebook
@@ -452,7 +448,7 @@ const facebookCallback = async (req, res) => {
                         pageAccessToken
                     ]
                 );
-                return res.redirect( "https://social-media-dashboard-six-tan.vercel.app/accounts");
+                return res.redirect("http://localhost:5174/accounts");
             }
         );
 
@@ -614,9 +610,7 @@ const twitterCallback = async (req, res) => {
                             });
                         }
 
-                        return res.redirect(
-                            "https://social-media-dashboard-six-tan.vercel.app/accounts"
-                        );
+                        return res.redirect("http://localhost:5174/accounts");
                     }
                 );
 
@@ -639,9 +633,7 @@ const twitterCallback = async (req, res) => {
                 (err) => { 
                     if (err) {
                         if (err.code === "ER_DUP_ENTRY") {
-                            return res.redirect(
-                                "https://social-media-dashboard-six-tan.vercel.app/accounts"
-                            );
+                            return res.redirect("http://localhost:5174/accounts");
                         }
                         console.log(err);
 
@@ -649,9 +641,7 @@ const twitterCallback = async (req, res) => {
                             message: "Database error"
                         });
                     }
-                    res.redirect(
-                        "https://social-media-dashboard-six-tan.vercel.app/accounts"
-                    );
+                    return res.redirect("http://localhost:5174/accounts");
                 }
             );
         }
