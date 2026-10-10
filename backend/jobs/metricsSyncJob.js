@@ -23,7 +23,7 @@ const syncInstagramMetrics = () => {
                             const { ig_id, access_token, page_id, id: account_id } = account;
 
                             // 2. Get page access token
-                            console.log("Using token:", access_token?.slice(0,20));
+                            // console.log("Using token:", access_token?.slice(0,20));
                             const page_access_token = access_token;
 
                             // 3. Instagram profile
